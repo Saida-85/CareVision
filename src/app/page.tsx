@@ -1,9 +1,9 @@
-import Image from "next/image";
+import HeroBanner from "@/components/HeroBanner";
 
 export default function Home() {
   return (
-    <div>
-      <h3>Hwe</h3>
-    </div>
+    <main className="min-h-screen transition-colors duration-300 bg-[#E8E4E2] dark:bg-[#1F1915] text-[#1F1915] dark:text-[#E8E4E2]">
+      <HeroBanner />
+    </main>
   );
 }
