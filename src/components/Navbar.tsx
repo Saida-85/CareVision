@@ -20,7 +20,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full px-8 py-4 flex items-center justify-between border-b transition-colors duration-300 shadow-sm bg-[#E8E4E2] dark:bg-[#1F1915] text-[#1F1915] dark:text-[#E8E4E2] border-[#D8D2CD] dark:border-[#3E3229]">
+    <nav className="sticky top-0 z-50 w-full px-8 py-4 flex items-center justify-between border-b transition-colors duration-300 shadow-sm bg-[#E8E4E2]/90 dark:bg-[#1F1915]/90 backdrop-blur-md text-[#1F1915] dark:text-[#E8E4E2] border-[#D8D2CD] dark:border-[#3E3229]">
       {/* Left: Care Vision Logo */}
       <div className="flex items-center cursor-pointer overflow-visible pl-4">
         <Image

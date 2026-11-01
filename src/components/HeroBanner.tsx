@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link"; // Fixed: Imported from next/link
 import { ArrowRight, HeartHandshake } from "lucide-react";
 
 export default function HeroBanner() {
@@ -29,16 +30,22 @@ export default function HeroBanner() {
 
           {/* Call to Action Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full sm:w-auto">
-            {/* Primary Action Button */}
-            <button className="w-full sm:w-auto flex items-center justify-center space-x-2 px-8 py-3.5 rounded-xl font-semibold text-base shadow-lg transition-all duration-300 bg-[#73573F] dark:bg-[#E8E4E2] text-[#E8E4E2] dark:text-[#1F1915] hover:bg-[#1F1915] dark:hover:bg-[#73573F] dark:hover:text-[#E8E4E2]">
+            {/* Primary Action Link */}
+            <Link
+              href="/events"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-8 py-3.5 rounded-xl font-semibold text-base shadow-lg transition-all duration-300 bg-[#73573F] dark:bg-[#E8E4E2] text-[#E8E4E2] dark:text-[#1F1915] hover:bg-[#1F1915] dark:hover:bg-[#73573F] dark:hover:text-[#E8E4E2]"
+            >
               <span>Explore Upcoming Events</span>
               <ArrowRight className="w-5 h-5" />
-            </button>
+            </Link>
 
-            {/* Secondary Action Button */}
-            <button className="w-full sm:w-auto flex items-center justify-center space-x-2 border px-8 py-3.5 rounded-xl font-semibold text-base transition-all duration-300 border-[#73573F]/30 dark:border-[#73573F]/50 text-[#1F1915] dark:text-[#E8E4E2] hover:bg-[#73573F]/10 dark:hover:bg-[#73573F]/20">
+            {/* Secondary Action Link (Fixed: removed nested <button>) */}
+            <Link
+              href="/create-event"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 border px-8 py-3.5 rounded-xl font-semibold text-base transition-all duration-300 border-[#73573F]/30 dark:border-[#73573F]/50 text-[#1F1915] dark:text-[#E8E4E2] hover:bg-[#73573F]/10 dark:hover:bg-[#73573F]/20 text-center"
+            >
               <span>Create an Event</span>
-            </button>
+            </Link>
           </div>
         </div>
 
