@@ -17,13 +17,14 @@ import {
 /* ------------------------------------------------------------------ */
 /*  Connect these two to BetterAuth once login is ready                */
 /* ------------------------------------------------------------------ */
-const userEmail = ""; // TODO: session.user.email
+// For testing right now, you can put your email or leave it to allow testing.
+const activeUserEmail = "saida@carevision.com"; // TODO: replace with session.user.email from BetterAuth
 async function getToken(): Promise<string> {
   return ""; // TODO: return the JWT for the Authorization header
 }
 
 /* ------------------------------------------------------------------ */
-/*  Constants                                                          */
+/*  Constants                                                         */
 /* ------------------------------------------------------------------ */
 const EVENT_TYPES = [
   "Cleanup",
@@ -124,9 +125,6 @@ function validate(form: FormState, minDate: string): Errors {
   return errors;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Theme-Aware Inputs & Field Components                              */
-/* ------------------------------------------------------------------ */
 function inputClass(hasError: boolean, withIcon = true) {
   return [
     "w-full rounded-xl border bg-[#E8E4E2]/50 dark:bg-[#1F1915]/60 py-3 pr-4 text-sm text-[#1F1915] dark:text-[#E8E4E2] outline-none transition-colors",
@@ -171,9 +169,6 @@ function Field({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Page Component                                                     */
-/* ------------------------------------------------------------------ */
 export default function CreateEventPage() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -182,7 +177,6 @@ export default function CreateEventPage() {
   const [minDate, setMinDate] = useState("");
 
   useEffect(() => {
-    // Evaluates client-side to prevent server mismatch/blocking route errors
     const today = new Date().toLocaleDateString("en-CA");
     setMinDate(today);
   }, []);
@@ -197,7 +191,7 @@ export default function CreateEventPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!userEmail) {
+    if (!activeUserEmail) {
       toast.error("Please log in to create an event.");
       return;
     }
@@ -208,7 +202,8 @@ export default function CreateEventPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
+      // Points directly to your Express server running on port 8000
+      const res = await fetch("http://localhost:8000/api/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -221,11 +216,13 @@ export default function CreateEventPage() {
           location: form.location.trim(),
           thumbnail: form.thumbnail.trim(),
           description: form.description.trim(),
+          userEmail: activeUserEmail,
         }),
       });
 
+      const data = await res.json().catch(() => ({}));
+
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
         toast.error(
           data.message ||
             "Something went wrong while adding your event. Please try again.",
@@ -235,7 +232,7 @@ export default function CreateEventPage() {
 
       toast.success("Event added! Neighbors can now find and join it.");
       setForm(emptyForm);
-      router.push("/events");
+      router.push("/upcoming-events");
     } catch {
       toast.error(
         "Couldn't reach the server. Check your connection and try again.",
@@ -248,13 +245,11 @@ export default function CreateEventPage() {
   return (
     <main className="min-h-screen px-4 py-12 transition-colors duration-300 md:py-16 bg-[#E8E4E2] dark:bg-[#1F1915] text-[#1F1915] dark:text-[#E8E4E2]">
       <div className="mx-auto max-w-2xl">
-        {/* Header Tag */}
         <span className="mb-4 inline-flex items-center space-x-2 rounded-full border border-[#73573F]/20 dark:border-[#73573F]/40 bg-[#73573F]/10 dark:bg-[#73573F]/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#73573F] dark:text-[#E8E4E2]">
           <Sparkles className="h-4 w-4" />
           <span>Care Vision Event</span>
         </span>
 
-        {/* Main Title */}
         <h1 className="text-3xl font-serif font-extrabold uppercase tracking-tight text-[#1F1915] dark:text-[#E8E4E2] md:text-4xl">
           Create a{" "}
           <span className="text-[#73573F] dark:text-[#E8E4E2]/90">
@@ -266,9 +261,7 @@ export default function CreateEventPage() {
           or a cleanup your area needs.
         </p>
 
-        {/* Form Container */}
         <form onSubmit={handleSubmit} noValidate className="mt-10 space-y-6">
-          {/* Title Field */}
           <Field label="Event Title" htmlFor="title" error={errors.title}>
             <div className="relative">
               <Type className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#73573F] dark:text-[#E8E4E2]/60" />
@@ -283,7 +276,6 @@ export default function CreateEventPage() {
             </div>
           </Field>
 
-          {/* Type + Date */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <Field
               label="Event Type"
@@ -334,7 +326,6 @@ export default function CreateEventPage() {
             </Field>
           </div>
 
-          {/* Location Field */}
           <Field label="Location" htmlFor="location" error={errors.location}>
             <div className="relative">
               <MapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#73573F] dark:text-[#E8E4E2]/60" />
@@ -349,7 +340,6 @@ export default function CreateEventPage() {
             </div>
           </Field>
 
-          {/* Thumbnail Field */}
           <div>
             <Field
               label="Thumbnail Image URL"
@@ -385,7 +375,6 @@ export default function CreateEventPage() {
             </div>
           </div>
 
-          {/* Description Field */}
           <Field
             label="Event Description"
             htmlFor="description"
@@ -404,17 +393,15 @@ export default function CreateEventPage() {
             </p>
           </Field>
 
-          {/* Organizer Details */}
           <div className="flex items-center justify-between rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] bg-[#E8E4E2]/60 dark:bg-[#1F1915]/60 px-5 py-4 text-sm">
             <span className="text-[#3E3229]/80 dark:text-[#E8E4E2]/70">
               Organizing as
             </span>
             <span className="font-semibold text-[#1F1915] dark:text-[#E8E4E2]">
-              {userEmail || "Not logged in"}
+              {activeUserEmail || "Not logged in"}
             </span>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={submitting}
