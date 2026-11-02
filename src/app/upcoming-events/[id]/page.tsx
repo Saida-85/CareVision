@@ -21,7 +21,9 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
 
   let event = null;
   try {
-    const res = await fetch(`http://localhost:8000/events/${id}`, {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+    const res = await fetch(`${API_URL}/events/${id}`, {
       cache: "no-store",
     });
     if (!res.ok) return notFound();
@@ -51,7 +53,7 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
           {/* Thumbnail Image */}
           <div className="relative h-72 w-full sm:h-96">
             <img
-              src={event.imageUrl} // <-- Make sure this says event.imageUrl, not event.thumbnail
+              src={event.imageUrl}
               alt={event.title}
               className="h-full w-full object-cover"
             />
@@ -126,7 +128,7 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
             {/* Description Section */}
             <div className="mt-8">
               <h2 className="text-xl font-bold text-[#1F1915] dark:text-[#E8E4E2] mb-3">
-                About This Cause
+                Event Description
               </h2>
               <p className="text-base leading-relaxed text-[#3E3229]/90 dark:text-[#E8E4E2]/80 whitespace-pre-line">
                 {event.description}
