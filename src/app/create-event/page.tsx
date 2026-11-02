@@ -17,14 +17,13 @@ import {
 /* ------------------------------------------------------------------ */
 /*  Connect these two to BetterAuth once login is ready                */
 /* ------------------------------------------------------------------ */
-// For testing right now, you can put your email or leave it to allow testing.
 const activeUserEmail = "saida@carevision.com"; // TODO: replace with session.user.email from BetterAuth
 async function getToken(): Promise<string> {
   return ""; // TODO: return the JWT for the Authorization header
 }
 
 /* ------------------------------------------------------------------ */
-/*  Constants                                                         */
+/*  Constants & Equal Image Mapping per Event Type                    */
 /* ------------------------------------------------------------------ */
 const EVENT_TYPES = [
   "Cleanup",
@@ -37,22 +36,39 @@ const EVENT_TYPES = [
   "Other",
 ];
 
+// Equal clickable image choices corresponding to your event types / causes
 const PHOTO_PRESETS = [
-  {
-    label: "Winter Clothes",
-    url: "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    label: "Blanket Relief",
-    url: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80",
-  },
   {
     label: "Cleanup",
     url: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80",
   },
   {
-    label: "Tree Plantation",
+    label: "Plantation",
     url: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    label: "Donation",
+    url: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    label: "Winter Relief",
+    url: "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    label: "Food Distribution",
+    url: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    label: "Health Camp",
+    url: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    label: "Education Support",
+    url: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    label: "Other",
+    url: "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&w=800&q=80",
   },
 ];
 
@@ -61,7 +77,7 @@ type FormState = {
   eventType: string;
   eventDate: string;
   location: string;
-  thumbnail: string;
+  imageUrl: string; // Updated from thumbnail
   description: string;
 };
 
@@ -72,7 +88,7 @@ const emptyForm: FormState = {
   eventType: "",
   eventDate: "",
   location: "",
-  thumbnail: "",
+  imageUrl: "", // Updated from thumbnail
   description: "",
 };
 
@@ -109,10 +125,10 @@ function validate(form: FormState, minDate: string): Errors {
     errors.location = "Tell volunteers where to go.";
   }
 
-  if (!form.thumbnail.trim()) {
-    errors.thumbnail = "Add a thumbnail image link.";
-  } else if (!isValidUrl(form.thumbnail.trim())) {
-    errors.thumbnail = "Enter a valid link starting with http:// or https://";
+  if (!form.imageUrl.trim()) {
+    errors.imageUrl = "Add an image URL.";
+  } else if (!isValidUrl(form.imageUrl.trim())) {
+    errors.imageUrl = "Enter a valid link starting with http:// or https://";
   }
 
   if (!form.description.trim()) {
@@ -202,7 +218,6 @@ export default function CreateEventPage() {
 
     setSubmitting(true);
     try {
-      // Points directly to your Express server running on port 8000
       const res = await fetch("http://localhost:8000/api/events", {
         method: "POST",
         headers: {
@@ -214,7 +229,7 @@ export default function CreateEventPage() {
           eventType: form.eventType,
           eventDate: form.eventDate,
           location: form.location.trim(),
-          thumbnail: form.thumbnail.trim(),
+          imageUrl: form.imageUrl.trim(), // Updated payload key
           description: form.description.trim(),
           userEmail: activeUserEmail,
         }),
@@ -340,38 +355,60 @@ export default function CreateEventPage() {
             </div>
           </Field>
 
+          {/* Image URL & Clickable Selection Grid */}
           <div>
             <Field
-              label="Thumbnail Image URL"
-              htmlFor="thumbnail"
-              error={errors.thumbnail}
-              hint="Use a clear photo of the cause. It appears on your event card."
+              label="Image URL"
+              htmlFor="imageUrl"
+              error={errors.imageUrl}
+              hint="Click a cause preset below or type/paste your own custom image URL."
             >
               <div className="relative">
                 <ImageIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#73573F] dark:text-[#E8E4E2]/60" />
                 <input
-                  id="thumbnail"
+                  id="imageUrl"
                   type="url"
-                  value={form.thumbnail}
-                  onChange={(e) => update("thumbnail", e.target.value)}
-                  placeholder="Paste a direct image link (ends in .jpg, .png, or .webp)"
-                  className={inputClass(!!errors.thumbnail)}
+                  value={form.imageUrl}
+                  onChange={(e) => update("imageUrl", e.target.value)}
+                  placeholder="Paste custom image link or select from below"
+                  className={inputClass(!!errors.imageUrl)}
                 />
               </div>
             </Field>
 
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#3E3229]/70 dark:text-[#E8E4E2]/60">
-              <span>Need a photo? Try:</span>
-              {PHOTO_PRESETS.map((preset) => (
-                <button
-                  key={preset.label}
-                  type="button"
-                  onClick={() => update("thumbnail", preset.url)}
-                  className="font-semibold text-[#73573F] dark:text-[#E8E4E2] underline transition-opacity hover:opacity-80"
-                >
-                  {preset.label}
-                </button>
-              ))}
+            {/* Clickable Preset Images Grid matching Event Types */}
+            <div className="mt-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#3E3229]/80 dark:text-[#E8E4E2]/70 mb-2">
+                Or pick a matching preset photo:
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {PHOTO_PRESETS.map((preset) => {
+                  const isSelected = form.imageUrl === preset.url;
+                  return (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => update("imageUrl", preset.url)}
+                      className={`group relative overflow-hidden rounded-xl border p-1.5 text-left transition-all ${
+                        isSelected
+                          ? "border-[#73573F] ring-2 ring-[#73573F] bg-[#73573F]/10"
+                          : "border-[#D8D2CD] dark:border-[#3E3229] bg-white/40 dark:bg-[#1F1915]/40 hover:border-[#73573F]"
+                      }`}
+                    >
+                      <div className="h-16 w-full overflow-hidden rounded-lg">
+                        <img
+                          src={preset.url}
+                          alt={preset.label}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      </div>
+                      <span className="mt-1 block truncate text-[11px] font-medium text-[#1F1915] dark:text-[#E8E4E2] text-center">
+                        {preset.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
