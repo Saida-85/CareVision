@@ -130,16 +130,20 @@ export default function Navbar() {
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="flex items-center space-x-2 cursor-pointer group"
             >
-              <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[#73573F] dark:border-[#00C896] shadow-md transition-transform group-hover:scale-105">
-                <Image
-                  src={
-                    user.image ||
-                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-                  }
-                  alt={user.name || "Profile"}
-                  fill
-                  className="object-cover"
-                />
+              <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[#73573F] dark:border-[#00C896] shadow-md transition-transform group-hover:scale-105 flex items-center justify-center bg-[#73573F] text-white font-bold text-sm">
+                {user?.image &&
+                (user.image.startsWith("http") ||
+                  user.image.startsWith("/")) ? (
+                  <img
+                    src={user.image}
+                    alt={user.name || "Profile"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>
+                    {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  </span>
+                )}
               </div>
               <button
                 type="button"
@@ -156,7 +160,7 @@ export default function Navbar() {
             {/* Logout Button in Navbar */}
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold text-xs border border-[#73573F]/30 dark:border-[#3E3229] text-[#73573F] dark:text-[#E8E4E2] hover:bg-[#73573F]/10 dark:hover:bg-[#3E3229]/50 transition-all shadow-sm"
+              className="hidden sm:flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold text-xs border border-[#73573F]/30 dark:border-[#3E3229] text-[#73573F] dark:text-[#E8E4E2] hover:bg-[#73573F]/10 dark:hover:bg-[#3E3229]/50 transition-all shadow-sm"
             >
               <LogOut className="w-3.5 h-3.5 text-rose-500" />
               <span>Logout</span>

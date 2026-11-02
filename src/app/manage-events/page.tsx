@@ -13,16 +13,19 @@ import {
   PlusCircle,
   Loader2,
   AlertCircle,
+  Eye,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
+import UpdateEventModal from "@/components/UpdateEventModal";
 
 interface EventItem {
   _id: string;
   title: string;
   description: string;
   eventType: string;
-  thumbnail: string;
+  thumbnail?: string;
+  imageUrl?: string;
   location: string;
   eventDate: string;
   userEmail: string;
@@ -36,6 +39,10 @@ export default function ManageEventsPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Edit Modal States
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Fetch events created by the logged-in user
   useEffect(() => {
@@ -57,7 +64,7 @@ export default function ManageEventsPage() {
       );
       if (!res.ok) throw new Error("Failed to fetch events");
       const data = await res.json();
-      setEvents(data);
+      setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
       toast.error("Could not load your created events.");
@@ -151,78 +158,116 @@ export default function ManageEventsPage() {
         ) : (
           /* Event Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((event) => (
-              <div
-                key={event._id}
-                className="group flex flex-col justify-between rounded-3xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white/70 dark:bg-[#1F1915]/80 overflow-hidden shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-2xl"
-              >
-                <div>
-                  {/* Event Thumbnail */}
-                  <div className="relative w-full h-48 overflow-hidden bg-[#D8D2CD]/40 dark:bg-[#3E3229]/40">
-                    <Image
-                      src={event.thumbnail}
-                      alt={event.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-4 right-4">
-                      <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#73573F] text-white shadow-md">
-                        {event.eventType}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Event Body */}
-                  <div className="p-6 space-y-3">
-                    <h2 className="text-lg font-serif font-bold text-[#1F1915] dark:text-[#E8E4E2] line-clamp-1">
-                      {event.title}
-                    </h2>
-                    <p className="text-xs text-[#3E3229]/80 dark:text-[#E8E4E2]/70 line-clamp-2 leading-relaxed">
-                      {event.description}
-                    </p>
-
-                    <div className="pt-2 space-y-2 text-xs text-[#3E3229]/70 dark:text-[#E8E4E2]/60 font-medium">
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="w-3.5 h-3.5 text-[#73573F] dark:text-[#E8E4E2]" />
-                        <span className="truncate">{event.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="w-3.5 h-3.5 text-[#73573F] dark:text-[#E8E4E2]" />
-                        <span>
-                          {new Date(event.eventDate).toLocaleDateString()}
+            {events.map((event) => {
+              const imageSrc = event.thumbnail || event.imageUrl || "";
+              return (
+                <div
+                  key={event._id}
+                  className="group flex flex-col justify-between rounded-3xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white/70 dark:bg-[#1F1915]/80 overflow-hidden shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-2xl"
+                >
+                  <div>
+                    {/* Event Thumbnail */}
+                    <div className="relative w-full h-48 overflow-hidden bg-[#D8D2CD]/40 dark:bg-[#3E3229]/40">
+                      {imageSrc ? (
+                        <Image
+                          src={imageSrc}
+                          alt={event.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-[#3E3229]/60">
+                          No Image
+                        </div>
+                      )}
+                      <div className="absolute top-4 right-4">
+                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#73573F] text-white shadow-md">
+                          {event.eventType}
                         </span>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* Actions Footer */}
-                <div className="p-4 border-t border-[#D8D2CD] dark:border-[#3E3229] flex items-center justify-between gap-3 bg-white/40 dark:bg-[#1F1915]/40">
-                  <Link href={`/edit-event/${event._id}`} className="flex-1">
-                    <button className="w-full flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl border border-[#73573F]/40 dark:border-[#3E3229] text-[#73573F] dark:text-[#E8E4E2] hover:bg-[#73573F]/10 dark:hover:bg-[#3E3229]/50 text-xs font-semibold transition-all">
+                    {/* Event Body */}
+                    <div className="p-6 space-y-3">
+                      <h2 className="text-lg font-serif font-bold text-[#1F1915] dark:text-[#E8E4E2] line-clamp-1">
+                        {event.title}
+                      </h2>
+                      <p className="text-xs text-[#3E3229]/80 dark:text-[#E8E4E2]/70 line-clamp-2 leading-relaxed">
+                        {event.description}
+                      </p>
+
+                      <div className="pt-2 space-y-2 text-xs text-[#3E3229]/70 dark:text-[#E8E4E2]/60 font-medium">
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="w-3.5 h-3.5 text-[#73573F] dark:text-[#E8E4E2]" />
+                          <span className="truncate">{event.location}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="w-3.5 h-3.5 text-[#73573F] dark:text-[#E8E4E2]" />
+                          <span>
+                            {event.eventDate
+                              ? new Date(event.eventDate).toLocaleDateString()
+                              : "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions Footer (View, Edit, Delete) */}
+                  <div className="p-4 border-t border-[#D8D2CD] dark:border-[#3E3229] grid grid-cols-3 gap-2 bg-white/40 dark:bg-[#1F1915]/40">
+                    <Link
+                      href={`/events/${event._id}`}
+                      className="inline-flex items-center justify-center space-x-1 py-2 px-2 rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] text-xs font-semibold text-[#1F1915] dark:text-[#E8E4E2] hover:bg-[#73573F]/10 transition-all"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>View</span>
+                    </Link>
+
+                    <button
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setIsEditModalOpen(true);
+                      }}
+                      className="inline-flex items-center justify-center space-x-1 py-2 px-2 rounded-xl border border-[#73573F]/40 bg-[#73573F]/10 hover:bg-[#73573F] text-[#1F1915] dark:text-[#E8E4E2] hover:text-white text-xs font-semibold transition-all"
+                    >
                       <Edit3 className="w-3.5 h-3.5" />
                       <span>Edit</span>
                     </button>
-                  </Link>
 
-                  <button
-                    onClick={() => handleDelete(event._id)}
-                    disabled={deletingId === event._id}
-                    className="flex-1 flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl border border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 text-xs font-semibold transition-all disabled:opacity-50"
-                  >
-                    {deletingId === event._id ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Trash2 className="w-3.5 h-3.5" />
-                    )}
-                    <span>Delete</span>
-                  </button>
+                    <button
+                      onClick={() => handleDelete(event._id)}
+                      disabled={deletingId === event._id}
+                      className="inline-flex items-center justify-center space-x-1 py-2 px-2 rounded-xl border border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 text-xs font-semibold transition-all disabled:opacity-50"
+                    >
+                      {deletingId === event._id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-3.5 h-3.5" />
+                      )}
+                      <span>Delete</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
+
+      {/* Edit Modal Component */}
+      {selectedEvent && (
+        <UpdateEventModal
+          event={selectedEvent}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedEvent(null);
+          }}
+          onUpdated={() => {
+            if (user?.email) fetchUserEvents(user.email);
+          }}
+        />
+      )}
     </main>
   );
 }
