@@ -10,7 +10,10 @@ export default async function Home() {
   let events = [];
   try {
     const res = await fetch(`${API_URL}/events`, { cache: "no-store" });
-    events = await res.json();
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      events = data;
+    }
   } catch (error) {
     console.error("Failed to fetch events:", error);
   }
