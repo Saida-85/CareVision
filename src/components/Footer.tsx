@@ -1,21 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
 import { MapPin, Phone, Mail, ArrowUp } from "lucide-react";
 
 export default function Footer() {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
-      setEmail("");
-    }
-  };
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -28,50 +16,7 @@ export default function Footer() {
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#73573F]/50 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* 1. INVITATION BAND (NEWSLETTER) */}
-        <div className="py-12 md:py-16 border-b border-[#73573F]/15 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div>
-            <h2 className="font-serif text-3xl sm:text-4xl font-light tracking-tight text-[#1F1915] dark:text-[#E8E4E2]">
-              Stay connected
-            </h2>
-            <p className="mt-2 text-sm text-[#3E3229]/80 dark:text-[#A39B94] font-light">
-              Receive thoughtful updates on health initiatives and community
-              impact.
-            </p>
-          </div>
-
-          <div className="relative">
-            {!subscribed ? (
-              <form
-                onSubmit={handleSubscribe}
-                className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end"
-              >
-                <div className="relative flex-grow">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email address"
-                    required
-                    className="w-full bg-transparent border-b border-[#73573F]/40 py-3 text-sm text-[#1F1915] dark:text-[#E8E4E2] placeholder:text-[#3E3229]/60 dark:placeholder:text-[#A39B94]/60 outline-none focus:border-[#73573F] transition-colors"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="bg-transparent border border-[#73573F] text-[#73573F] hover:bg-[#73573F] hover:text-[#E8E4E2] dark:hover:text-[#1F1915] px-8 py-3 text-xs uppercase tracking-[0.18em] font-medium transition-all duration-300 min-h-[44px] flex items-center justify-center cursor-pointer"
-                >
-                  Subscribe
-                </button>
-              </form>
-            ) : (
-              <div className="text-[#73573F] font-serif italic text-xl animate-fade-in">
-                Thank you for subscribing to Care Vision.
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 2. MAIN FOOTER GRID (3 COLUMNS: Brand, Services, Contact) */}
+        {/* 1. MAIN FOOTER GRID (3 COLUMNS: Brand, Services, Contact) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 py-16 gap-12 lg:gap-8">
           {/* Column 1: Brand */}
           <div className="space-y-6">
@@ -143,10 +88,11 @@ export default function Footer() {
               </div>
 
               {/* 24/7 Support Badge */}
+              {/* 24/7 Support Badge */}
               <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-[#73573F]/20 bg-[#73573F]/5 mt-2">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#73573F] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#73573F]"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
                 <span className="text-[10px] uppercase tracking-wider text-[#1F1915] dark:text-[#E8E4E2] font-normal">
                   Support available 24/7
@@ -156,7 +102,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* 3. BOTTOM BAR */}
+        {/* 2. BOTTOM BAR */}
         <div className="py-8 border-t border-[#73573F]/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#3E3229]/80 dark:text-[#A39B94] font-light">
           <p>© {currentYear} Care Vision. All rights reserved.</p>
 

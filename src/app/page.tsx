@@ -1,7 +1,8 @@
 import HeroBanner from "@/components/HeroBanner";
 import HowCanYouHelp from "@/components/HowCanYouHelp";
 import EventCard from "@/components/EventCard";
-import VisualStories from "@/components/VisualStories"; // <--- Import here
+import VisualStories from "@/components/VisualStories";
+import Newsletter from "@/components/Newsletter"; // <--- 1. Import Newsletter here
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -23,7 +24,6 @@ export default async function Home() {
     <main className="min-h-screen transition-colors duration-300 bg-[#E8E4E2] dark:bg-[#1F1915] text-[#1F1915] dark:text-[#E8E4E2]">
       <HeroBanner />
       <HowCanYouHelp />
-
       {/* Upcoming Initiatives Section */}
       <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
         <div className="mb-12 flex flex-col md:flex-row md:items-end md:justify-between">
@@ -55,9 +55,10 @@ export default async function Home() {
           ))}
         </div>
       </section>
-
       {/* Visual Stories Gallery Section */}
       <VisualStories />
+      {/* Newsletter Subscription Section */}
+      <Newsletter /> {/* <--- 2. Add Newsletter component here */}
     </main>
   );
 }
