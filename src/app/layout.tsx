@@ -3,6 +3,7 @@ import { Josefin_Sans } from "next/font/google";
 import { Toaster } from "react-hot-toast"; // 1. Import Toaster
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const josefinSans = Josefin_Sans({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
         />
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );

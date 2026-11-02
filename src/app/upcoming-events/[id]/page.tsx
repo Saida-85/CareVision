@@ -51,7 +51,7 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
           {/* Thumbnail Image */}
           <div className="relative h-72 w-full sm:h-96">
             <img
-              src={event.thumbnail}
+              src={event.imageUrl} // <-- Make sure this says event.imageUrl, not event.thumbnail
               alt={event.title}
               className="h-full w-full object-cover"
             />
