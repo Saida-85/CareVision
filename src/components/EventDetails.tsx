@@ -30,6 +30,9 @@ export default function EventDetails({
   const [loading, setLoading] = useState(false);
 
   const handleJoinToggle = async () => {
+    console.log("Button clicked! currentUserId:", currentUserId);
+    console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
+
     if (!currentUserId) {
       toast.error("Please log in to join this event.");
       return;
@@ -41,12 +44,15 @@ export default function EventDetails({
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/events/${event._id}/leave`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/events/${event._id}/join`;
 
+      console.log("Fetching endpoint:", endpoint);
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUserId }),
       });
 
+      console.log("Response status:", res.status);
       if (!res.ok) throw new Error("Failed to update event status");
 
       if (!isJoined) {
@@ -61,8 +67,8 @@ export default function EventDetails({
         toast("You have left this event.", { icon: "ℹ️" });
       }
     } catch (err) {
+      console.error("Catch error:", err);
       toast.error("Something went wrong. Please try again.");
-      console.error(err);
     } finally {
       setLoading(false);
     }

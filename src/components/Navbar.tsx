@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link"; // Import Link component
 import { Calendar, Sun, Moon, LogIn } from "lucide-react";
 
 export default function Navbar() {
@@ -21,8 +22,11 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 w-full px-8 py-4 flex items-center justify-between border-b transition-colors duration-300 shadow-sm bg-[#E8E4E2]/90 dark:bg-[#1F1915]/90 backdrop-blur-md text-[#1F1915] dark:text-[#E8E4E2] border-[#D8D2CD] dark:border-[#3E3229]">
-      {/* Left: Care Vision Logo */}
-      <div className="flex items-center cursor-pointer overflow-visible pl-4">
+      {/* Left: Care Vision Logo linked to Home */}
+      <Link
+        href="/"
+        className="flex items-center cursor-pointer overflow-visible pl-4"
+      >
         <Image
           src="/careVisionLogo.png"
           alt="Care Vision Logo"
@@ -37,13 +41,16 @@ export default function Navbar() {
             transformOrigin: "left center",
           }}
         />
-      </div>
+      </Link>
 
       {/* Center: Navigation Link */}
-      <div className="flex items-center space-x-2 cursor-pointer transition-colors duration-200 font-medium text-sm text-[#3E3229] hover:text-[#1F1915] dark:text-[#E8E4E2]/80 dark:hover:text-[#E8E4E2]">
+      <Link
+        href="/upcoming-events"
+        className="flex items-center space-x-2 cursor-pointer transition-colors duration-200 font-medium text-sm text-[#3E3229] hover:text-[#1F1915] dark:text-[#E8E4E2]/80 dark:hover:text-[#E8E4E2]"
+      >
         <Calendar className="w-4 h-4 text-[#73573F] dark:text-[#E8E4E2]/60" />
         <span>Upcoming Events</span>
-      </div>
+      </Link>
 
       {/* Right: Controls */}
       <div className="flex items-center space-x-4">
@@ -60,11 +67,13 @@ export default function Navbar() {
           )}
         </button>
 
-        {/* Login Button */}
-        <button className="flex items-center space-x-2 px-5 py-2 rounded-xl font-semibold text-sm shadow-md transition-all duration-300 bg-[#73573F] text-[#E8E4E2] hover:bg-[#1F1915] dark:bg-[#E8E4E2] dark:text-[#1F1915] dark:hover:bg-[#73573F] dark:hover:text-[#E8E4E2]">
-          <LogIn className="w-4 h-4" />
-          <span>Login</span>
-        </button>
+        {/* Login Button Linked to /signup */}
+        <Link href="/signup">
+          <button className="flex items-center space-x-2 px-5 py-2 rounded-xl font-semibold text-sm shadow-md transition-all duration-300 bg-[#73573F] text-[#E8E4E2] hover:bg-[#1F1915] dark:bg-[#E8E4E2] dark:text-[#1F1915] dark:hover:bg-[#73573F] dark:hover:text-[#E8E4E2]">
+            <LogIn className="w-4 h-4" />
+            <span>Login</span>
+          </button>
+        </Link>
       </div>
     </nav>
   );

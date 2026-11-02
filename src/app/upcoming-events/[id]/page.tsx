@@ -8,8 +8,8 @@ import {
   Sparkles,
   Tag,
   Clock,
-  UserPlus,
 } from "lucide-react";
+import EventDetails from "@/components/EventDetails"; // <-- Import your interactive component
 
 interface EventDetailProps {
   params: Promise<{
@@ -37,6 +37,10 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
   if (!event || !event._id) {
     return notFound();
   }
+
+  // Temporary test user ID for development/testing.
+  // Replace this with your actual auth session user ID later!
+  const currentUserId = "user_test_123";
 
   return (
     <main className="min-h-screen px-4 py-12 transition-colors duration-300 md:py-16 bg-[#E8E4E2] dark:bg-[#1F1915] text-[#1F1915] dark:text-[#E8E4E2]">
@@ -85,14 +89,8 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
                 </h1>
               </div>
 
-              {/* Join Event Action Button */}
-              <button
-                type="button"
-                className="inline-flex items-center justify-center space-x-2 rounded-xl bg-[#73573F] hover:bg-[#5c4532] text-white px-6 py-3 text-sm font-semibold uppercase tracking-wider transition-all shadow-lg hover:shadow-xl active:scale-95"
-              >
-                <UserPlus className="h-5 w-5" />
-                <span>Join Event</span>
-              </button>
+              {/* Interactive Join Component with Button & Toast */}
+              <EventDetails event={event} currentUserId={currentUserId} />
             </div>
 
             {/* Meta Info Grid */}
