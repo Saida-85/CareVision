@@ -1,6 +1,7 @@
 import HeroBanner from "@/components/HeroBanner";
 import HowCanYouHelp from "@/components/HowCanYouHelp";
 import EventCard from "@/components/EventCard";
+import VisualStories from "@/components/VisualStories"; // <--- Import here
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -54,6 +55,9 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      {/* Visual Stories Gallery Section */}
+      <VisualStories />
     </main>
   );
 }

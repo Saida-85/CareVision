@@ -8,6 +8,7 @@ import {
   Sparkles,
   Tag,
   Clock,
+  UserPlus,
 } from "lucide-react";
 
 interface EventDetailProps {
@@ -30,6 +31,7 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
     event = await res.json();
   } catch (error) {
     console.error("Failed to fetch event details:", error);
+    return notFound();
   }
 
   if (!event || !event._id) {
@@ -53,8 +55,12 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
           {/* Thumbnail Image */}
           <div className="relative h-72 w-full sm:h-96">
             <img
-              src={event.imageUrl}
-              alt={event.title}
+              src={
+                event.imageUrl ||
+                event.image ||
+                "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80"
+              }
+              alt={event.title || "Event Image"}
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1F1915]/70 via-transparent to-transparent" />
@@ -62,22 +68,34 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
             {/* Event Type Badge over image */}
             <span className="absolute bottom-4 left-4 inline-flex items-center space-x-1.5 rounded-full bg-[#73573F] px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white shadow-md">
               <Tag className="h-3.5 w-3.5" />
-              <span>{event.eventType}</span>
+              <span>{event.eventType || "Community Drive"}</span>
             </span>
           </div>
 
           {/* Content Body */}
           <div className="p-6 sm:p-10">
-            <span className="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-widest text-[#73573F] dark:text-[#E8E4E2]/70 mb-3">
-              <Sparkles className="h-4 w-4" />
-              <span>Care Vision Initiative</span>
-            </span>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+              <div>
+                <span className="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-widest text-[#73573F] dark:text-[#E8E4E2]/70 mb-2">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Care Vision Initiative</span>
+                </span>
+                <h1 className="text-3xl font-serif font-extrabold uppercase tracking-tight text-[#1F1915] dark:text-[#E8E4E2] md:text-4xl">
+                  {event.title}
+                </h1>
+              </div>
 
-            <h1 className="text-3xl font-serif font-extrabold uppercase tracking-tight text-[#1F1915] dark:text-[#E8E4E2] md:text-4xl">
-              {event.title}
-            </h1>
+              {/* Join Event Action Button */}
+              <button
+                type="button"
+                className="inline-flex items-center justify-center space-x-2 rounded-xl bg-[#73573F] hover:bg-[#5c4532] text-white px-6 py-3 text-sm font-semibold uppercase tracking-wider transition-all shadow-lg hover:shadow-xl active:scale-95"
+              >
+                <UserPlus className="h-5 w-5" />
+                <span>Join Event</span>
+              </button>
+            </div>
 
-            {/* Meta Info Grid (Date, Location, Organizer) */}
+            {/* Meta Info Grid */}
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3 border-y border-[#D8D2CD] dark:border-[#3E3229] py-6 text-sm">
               {/* Date */}
               <div className="flex items-center space-x-3">
@@ -89,7 +107,7 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
                     Event Date
                   </p>
                   <p className="font-semibold text-[#1F1915] dark:text-[#E8E4E2]">
-                    {event.eventDate}
+                    {event.eventDate || "TBA"}
                   </p>
                 </div>
               </div>
@@ -104,7 +122,7 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
                     Location
                   </p>
                   <p className="font-semibold text-[#1F1915] dark:text-[#E8E4E2] capitalize">
-                    {event.location}
+                    {event.location || "Dhaka, Bangladesh"}
                   </p>
                 </div>
               </div>
@@ -119,7 +137,7 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
                     Organizer
                   </p>
                   <p className="font-semibold text-[#1F1915] dark:text-[#E8E4E2] truncate max-w-[180px]">
-                    {event.userEmail}
+                    {event.userEmail || "community@carevision.org"}
                   </p>
                 </div>
               </div>
@@ -140,7 +158,10 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
               <span className="flex items-center space-x-1">
                 <Clock className="h-3.5 w-3.5" />
                 <span>
-                  Published on {new Date(event.createdAt).toLocaleDateString()}
+                  Published on{" "}
+                  {event.createdAt
+                    ? new Date(event.createdAt).toLocaleDateString()
+                    : "Recently"}
                 </span>
               </span>
               <span>Event ID: {event._id}</span>
