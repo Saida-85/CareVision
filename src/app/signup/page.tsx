@@ -3,70 +3,43 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  Mail,
-  Lock,
-  User,
-  Image as ImageIcon,
-  Eye,
-  EyeOff,
-  Heart,
-} from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Heart } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
-import { authClient } from "@/lib/auth-client"; // Adjust path to your auth client
+import { authClient } from "@/lib/auth-client";
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [photoURL, setPhotoURL] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Assignment Password Validation Rules:
-    // - Length at least 6 characters
-    // - Must have an uppercase letter
-    // - Must have a lowercase letter
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters long.");
-      return;
-    }
-    if (!/[A-Z]/.test(password)) {
-      toast.error("Password must contain at least one uppercase letter.");
-      return;
-    }
-    if (!/[a-z]/.test(password)) {
-      toast.error("Password must contain at least one lowercase letter.");
+    if (!email || !password) {
+      toast.error("Please fill out all fields.");
       return;
     }
 
     try {
       setLoading(true);
-
-      // Better Auth Sign Up (Automatically saves user data to MongoDB database)
-      const { error } = await authClient.signUp.email({
+      const { error } = await authClient.signIn.email({
         email,
         password,
-        name,
-        image: photoURL, // Maps photoURL to Better Auth's image field saved in MongoDB
       });
 
       if (error) {
-        toast.error(error.message || "Registration failed.");
+        toast.error(error.message || "Invalid email or password.");
         return;
       }
 
-      toast.success("Account created successfully! Welcome to CareVision.");
+      toast.success("Successfully logged in!");
       router.push("/");
       router.refresh();
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong during registration.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -97,38 +70,18 @@ export default function RegisterPage() {
         {/* Heading */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-serif font-bold tracking-tight text-[#1F1915] dark:text-[#E8E4E2] uppercase">
-            Create Account
+            Welcome Back
           </h1>
           <p className="text-xs text-[#3E3229]/70 dark:text-[#E8E4E2]/70 mt-2 font-light">
-            Join CareVision to organize and participate in drives
+            Sign in to organize and join community drives
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleRegister} className="space-y-4">
-          {/* Name Field */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#3E3229] dark:text-[#E8E4E2]/80 mb-1.5">
-              Name
-            </label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-[#3E3229]/50 dark:text-[#E8E4E2]/50">
-                <User className="h-4 w-4" />
-              </span>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Saida Nosrat"
-                required
-                className="w-full rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white dark:bg-[#1F1915]/60 py-3 pl-11 pr-4 text-sm text-[#1F1915] dark:text-[#E8E4E2] placeholder-[#3E3229]/40 dark:placeholder-[#E8E4E2]/40 focus:border-[#73573F] focus:outline-none focus:ring-1 focus:ring-[#73573F] transition-all"
-              />
-            </div>
-          </div>
-
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email Field */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#3E3229] dark:text-[#E8E4E2]/80 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#3E3229] dark:text-[#E8E4E2]/80 mb-2">
               Email
             </label>
             <div className="relative">
@@ -141,36 +94,18 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
                 required
-                className="w-full rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white dark:bg-[#1F1915]/60 py-3 pl-11 pr-4 text-sm text-[#1F1915] dark:text-[#E8E4E2] placeholder-[#3E3229]/40 dark:placeholder-[#E8E4E2]/40 focus:border-[#73573F] focus:outline-none focus:ring-1 focus:ring-[#73573F] transition-all"
-              />
-            </div>
-          </div>
-
-          {/* Photo URL Field */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#3E3229] dark:text-[#E8E4E2]/80 mb-1.5">
-              Photo URL
-            </label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-[#3E3229]/50 dark:text-[#E8E4E2]/50">
-                <ImageIcon className="h-4 w-4" />
-              </span>
-              <input
-                type="url"
-                value={photoURL}
-                onChange={(e) => setPhotoURL(e.target.value)}
-                placeholder="https://example.com/photo.jpg"
-                required
-                className="w-full rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white dark:bg-[#1F1915]/60 py-3 pl-11 pr-4 text-sm text-[#1F1915] dark:text-[#E8E4E2] placeholder-[#3E3229]/40 dark:placeholder-[#E8E4E2]/40 focus:border-[#73573F] focus:outline-none focus:ring-1 focus:ring-[#73573F] transition-all"
+                className="w-full rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white dark:bg-[#1F1915]/60 py-3.5 pl-11 pr-4 text-sm text-[#1F1915] dark:text-[#E8E4E2] placeholder-[#3E3229]/40 dark:placeholder-[#E8E4E2]/40 focus:border-[#73573F] focus:outline-none focus:ring-1 focus:ring-[#73573F] transition-all"
               />
             </div>
           </div>
 
           {/* Password Field */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#3E3229] dark:text-[#E8E4E2]/80 mb-1.5">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-[#3E3229] dark:text-[#E8E4E2]/80">
+                Password
+              </label>
+            </div>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-[#3E3229]/50 dark:text-[#E8E4E2]/50">
                 <Lock className="h-4 w-4" />
@@ -181,7 +116,7 @@ export default function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white dark:bg-[#1F1915]/60 py-3 pl-11 pr-12 text-sm text-[#1F1915] dark:text-[#E8E4E2] placeholder-[#3E3229]/40 dark:placeholder-[#E8E4E2]/40 focus:border-[#73573F] focus:outline-none focus:ring-1 focus:ring-[#73573F] transition-all"
+                className="w-full rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white dark:bg-[#1F1915]/60 py-3.5 pl-11 pr-12 text-sm text-[#1F1915] dark:text-[#E8E4E2] placeholder-[#3E3229]/40 dark:placeholder-[#E8E4E2]/40 focus:border-[#73573F] focus:outline-none focus:ring-1 focus:ring-[#73573F] transition-all"
               />
               <button
                 type="button"
@@ -195,24 +130,21 @@ export default function RegisterPage() {
                 )}
               </button>
             </div>
-            <p className="text-[10px] text-[#3E3229]/60 dark:text-[#E8E4E2]/50 mt-1">
-              Must have uppercase, lowercase, and min 6 characters.
-            </p>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 flex items-center justify-center space-x-2 rounded-xl bg-[#73573F] hover:bg-[#5c4532] text-white py-3.5 text-xs font-bold uppercase tracking-[0.15em] transition-all shadow-lg active:scale-[0.98] disabled:opacity-50"
+            className="w-full flex items-center justify-center space-x-2 rounded-xl bg-[#73573F] hover:bg-[#5c4532] text-white py-3.5 text-xs font-bold uppercase tracking-[0.15em] transition-all shadow-lg active:scale-[0.98] disabled:opacity-50"
           >
-            <span>{loading ? "Creating Account..." : "Register"}</span>
+            <span>{loading ? "Signing In..." : "Sign In"}</span>
             {!loading && <span className="text-base">→</span>}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="relative my-6">
+        <div className="relative my-7">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-[#D8D2CD] dark:border-[#3E3229]" />
           </div>
@@ -233,14 +165,14 @@ export default function RegisterPage() {
           <span>Continue with Google</span>
         </button>
 
-        {/* Footer Redirect to Login */}
-        <p className="mt-6 text-center text-xs text-[#3E3229]/70 dark:text-[#E8E4E2]/70 font-light">
-          Already have an account?{" "}
+        {/* Footer Redirect to Register */}
+        <p className="mt-8 text-center text-xs text-[#3E3229]/70 dark:text-[#E8E4E2]/70 font-light">
+          Don&apos;t have an account?{" "}
           <Link
-            href="/signup"
+            href="/register"
             className="font-semibold text-[#73573F] dark:text-[#E8E4E2] hover:underline"
           >
-            Login here
+            Register here
           </Link>
         </p>
       </div>

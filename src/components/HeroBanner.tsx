@@ -3,9 +3,24 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, HeartHandshake } from "lucide-react";
+import toast from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
 
 export default function HeroBanner() {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  const handleCreateEventClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      toast.error("Please login to create an event!");
+      router.push("/signup"); // Redirects to signup/login page
+    }
+  };
+
   return (
     <section className="relative w-full py-16 md:py-24 px-8 border-b transition-colors duration-300 bg-[#E8E4E2] dark:bg-[#1F1915] text-[#1F1915] dark:text-[#E8E4E2] border-[#D8D2CD] dark:border-[#3E3229]">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -39,9 +54,10 @@ export default function HeroBanner() {
               <ArrowRight className="w-5 h-5" />
             </Link>
 
-            {/* Secondary Action Link */}
+            {/* Protected Secondary Action Link */}
             <Link
               href="/create-event"
+              onClick={handleCreateEventClick}
               className="w-full sm:w-auto flex items-center justify-center space-x-2 border px-8 py-3.5 rounded-xl font-semibold text-base transition-all duration-300 border-[#73573F]/30 dark:border-[#73573F]/50 text-[#1F1915] dark:text-[#E8E4E2] hover:bg-[#73573F]/10 dark:hover:bg-[#73573F]/20 text-center"
             >
               <span>Create an Event</span>

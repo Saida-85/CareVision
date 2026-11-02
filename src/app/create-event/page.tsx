@@ -13,18 +13,8 @@ import {
   Tag,
   Type,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
-/* ------------------------------------------------------------------ */
-/*  Connect these two to BetterAuth once login is ready                */
-/* ------------------------------------------------------------------ */
-const activeUserEmail = "saida@carevision.com"; // TODO: replace with session.user.email from BetterAuth
-async function getToken(): Promise<string> {
-  return ""; // TODO: return the JWT for the Authorization header
-}
-
-/* ------------------------------------------------------------------ */
-/*  Constants & Equal Image Mapping per Event Type                    */
-/* ------------------------------------------------------------------ */
 const EVENT_TYPES = [
   "Cleanup",
   "Plantation",
@@ -36,7 +26,6 @@ const EVENT_TYPES = [
   "Other",
 ];
 
-// Equal clickable image choices corresponding to your event types / causes
 const PHOTO_PRESETS = [
   {
     label: "Cleanup",
@@ -77,7 +66,7 @@ type FormState = {
   eventType: string;
   eventDate: string;
   location: string;
-  imageUrl: string; // Updated from thumbnail
+  imageUrl: string;
   description: string;
 };
 
@@ -88,7 +77,7 @@ const emptyForm: FormState = {
   eventType: "",
   eventDate: "",
   location: "",
-  imageUrl: "", // Updated from thumbnail
+  imageUrl: "",
   description: "",
 };
 
@@ -187,10 +176,21 @@ function Field({
 
 export default function CreateEventPage() {
   const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const [minDate, setMinDate] = useState("");
+
+  // Route Guard for unauthenticated access
+  useEffect(() => {
+    if (!isPending && !user) {
+      toast.error("Please login to create an event!");
+      router.push("/signup");
+    }
+  }, [user, isPending, router]);
 
   useEffect(() => {
     const today = new Date().toLocaleDateString("en-CA");
@@ -207,8 +207,9 @@ export default function CreateEventPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!activeUserEmail) {
+    if (!user?.email) {
       toast.error("Please log in to create an event.");
+      router.push("/signup");
       return;
     }
 
@@ -218,20 +219,20 @@ export default function CreateEventPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch("http://localhost:8000/api/events", {
+      const res = await fetch("/api/events/manage", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${await getToken()}`,
         },
         body: JSON.stringify({
           title: form.title.trim(),
           eventType: form.eventType,
           eventDate: form.eventDate,
           location: form.location.trim(),
-          imageUrl: form.imageUrl.trim(), // Updated payload key
+          imageUrl: form.imageUrl.trim(),
+          thumbnail: form.imageUrl.trim(),
           description: form.description.trim(),
-          userEmail: activeUserEmail,
+          userEmail: user.email,
         }),
       });
 
@@ -248,6 +249,7 @@ export default function CreateEventPage() {
       toast.success("Event added! Neighbors can now find and join it.");
       setForm(emptyForm);
       router.push("/upcoming-events");
+      router.refresh();
     } catch {
       toast.error(
         "Couldn't reach the server. Check your connection and try again.",
@@ -255,6 +257,14 @@ export default function CreateEventPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (isPending || !user) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[#E8E4E2] dark:bg-[#1F1915] text-[#1F1915] dark:text-[#E8E4E2]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#73573F] dark:text-[#E8E4E2]" />
+      </main>
+    );
   }
 
   return (
@@ -376,7 +386,6 @@ export default function CreateEventPage() {
               </div>
             </Field>
 
-            {/* Clickable Preset Images Grid matching Event Types */}
             <div className="mt-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-[#3E3229]/80 dark:text-[#E8E4E2]/70 mb-2">
                 Or pick a matching preset photo:
@@ -435,7 +444,7 @@ export default function CreateEventPage() {
               Organizing as
             </span>
             <span className="font-semibold text-[#1F1915] dark:text-[#E8E4E2]">
-              {activeUserEmail || "Not logged in"}
+              {user.email}
             </span>
           </div>
 
