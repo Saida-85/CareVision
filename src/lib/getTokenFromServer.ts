@@ -1,14 +1,19 @@
-import { headers } from "next/headers";
-import { auth } from "./auth";
+import { authClient } from "./auth-client";
 
-export const getTokenFromServer = async () => {
+export const getTokenFromClient = async () => {
     try {
-        const jwtToken = await auth.api.getToken({
-            headers: await headers(),
-        });
-        return jwtToken?.token || null;
-    } catch (error) {
-        console.error("Error fetching server-side token:", error);
+        // Fetch the JWT token from Better Auth's client plugin endpoint
+        const { data, error } = await authClient.getSession();
+        
+        if (error || !data) {
+            return null;
+        }
+
+        // Request a token exchange or fetch token via authClient plugin if available
+        const tokenRes = await (authClient as any).jwt?.getToken?.();
+        return tokenRes?.data?.token || null;
+    } catch (err) {
+        console.error("Error retrieving client JWT token:", err);
         return null;
     }
 };
