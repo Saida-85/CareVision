@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +48,7 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
+      setGoogleLoading(true);
       await authClient.signIn.social({
         provider: "google",
         callbackURL: "/",
@@ -54,6 +56,7 @@ export default function LoginPage() {
     } catch (err) {
       console.error(err);
       toast.error("Google sign-in failed.");
+      setGoogleLoading(false);
     }
   };
 
@@ -159,10 +162,13 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleLogin}
           type="button"
-          className="w-full flex items-center justify-center space-x-3 rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white/50 dark:bg-[#1F1915]/50 hover:bg-[#D8D2CD]/20 dark:hover:bg-[#3E3229]/50 py-3.5 text-xs font-semibold uppercase tracking-wider text-[#1F1915] dark:text-[#E8E4E2] transition-all shadow-sm active:scale-[0.98]"
+          disabled={googleLoading}
+          className="w-full flex items-center justify-center space-x-3 rounded-xl border border-[#D8D2CD] dark:border-[#3E3229] bg-white/50 dark:bg-[#1F1915]/50 hover:bg-[#D8D2CD]/20 dark:hover:bg-[#3E3229]/50 py-3.5 text-xs font-semibold uppercase tracking-wider text-[#1F1915] dark:text-[#E8E4E2] transition-all shadow-sm active:scale-[0.98] disabled:opacity-50"
         >
           <FcGoogle className="h-5 w-5" />
-          <span>Continue with Google</span>
+          <span>
+            {googleLoading ? "Connecting..." : "Continue with Google"}
+          </span>
         </button>
 
         {/* Footer Redirect to Register */}
