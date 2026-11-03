@@ -2,9 +2,11 @@ import HeroBanner from "@/components/HeroBanner";
 import HowCanYouHelp from "@/components/HowCanYouHelp";
 import EventCard from "@/components/EventCard";
 import VisualStories from "@/components/VisualStories";
-import Newsletter from "@/components/Newsletter"; // <--- 1. Import Newsletter here
+import Newsletter from "@/components/Newsletter";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+
+export const dynamic = "force-dynamic"; // <--- Add this line
 
 export default async function Home() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -58,7 +60,7 @@ export default async function Home() {
       {/* Visual Stories Gallery Section */}
       <VisualStories />
       {/* Newsletter Subscription Section */}
-      <Newsletter /> {/* <--- 2. Add Newsletter component here */}
+      <Newsletter />
     </main>
   );
 }

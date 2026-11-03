@@ -1,5 +1,7 @@
 import EventCard from "@/components/EventCard";
 
+export const dynamic = "force-dynamic"; // <--- Add this line
+
 export default async function UpcomingEventsPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 

@@ -18,8 +18,8 @@ interface EventDetailsProps {
     eventDate: string;
     volunteers?: string[];
   };
+  currentUserId?: string; // <-- Add this back
 }
-
 export default function EventDetails({ event }: EventDetailsProps) {
   const router = useRouter();
 
