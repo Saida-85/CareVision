@@ -14,6 +14,7 @@ import {
   Type,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { getTokenFromClient } from "@/lib/getTokenFromClient";
 
 const EVENT_TYPES = [
   "Cleanup",
@@ -219,10 +220,20 @@ export default function CreateEventPage() {
 
     setSubmitting(true);
     try {
+      // Fetch JWT token using the helper function
+      const token = await getTokenFromClient();
+
+      if (!token) {
+        throw new Error(
+          "Authentication error: Could not retrieve secure session token.",
+        );
+      }
+
       const res = await fetch("/api/events/manage", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           title: form.title.trim(),
@@ -236,11 +247,11 @@ export default function CreateEventPage() {
         }),
       });
 
-      const data = await res.json().catch(() => ({}));
+      const responseData = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         toast.error(
-          data.message ||
+          responseData.message ||
             "Something went wrong while adding your event. Please try again.",
         );
         return;
@@ -250,9 +261,11 @@ export default function CreateEventPage() {
       setForm(emptyForm);
       router.push("/upcoming-events");
       router.refresh();
-    } catch {
+    } catch (err: any) {
+      console.error(err);
       toast.error(
-        "Couldn't reach the server. Check your connection and try again.",
+        err.message ||
+          "Couldn't reach the server. Check your connection and try again.",
       );
     } finally {
       setSubmitting(false);

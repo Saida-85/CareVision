@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CalendarDays, MapPin, Tag, Edit, Trash2, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 import UpdateEventModal from "@/components/UpdateEventModal";
+import { getTokenFromClient } from "@/lib/getTokenFromClient";
 
 interface ManageEventCardProps {
   event: {
@@ -35,17 +36,29 @@ export default function ManageEventCard({
 
     try {
       setDeleting(true);
+
+      const token = await getTokenFromClient();
+      if (!token) {
+        throw new Error(
+          "Authentication error: Could not retrieve secure session token.",
+        );
+      }
+
       const res = await fetch(`/api/events/manage?id=${event._id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      if (!res.ok) throw new Error("Failed to delete event");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || "Failed to delete event");
 
       toast.success("Event deleted successfully.");
       onEventDeleted(event._id);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Could not delete event.");
+      toast.error(err.message || "Could not delete event.");
     } finally {
       setDeleting(false);
     }

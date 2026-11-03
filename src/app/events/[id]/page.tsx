@@ -105,11 +105,29 @@ export default function EventDetailsPage({
     try {
       setActionLoading(true);
 
+      // Fetch the JWT token using the Better Auth client plugin
+      const { data: jwtData, error: jwtError } = await (
+        authClient as any
+      ).jwt.getToken();
+      const token = jwtData?.token;
+
+      if (jwtError || !token) {
+        throw new Error(
+          "Authentication error: Could not retrieve secure session token.",
+        );
+      }
+
+      // Configure authorization headers with Bearer token
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
       if (hasJoined) {
         // LEAVE EVENT
         const res = await fetch("/api/events/leave", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({
             eventId: event._id,
             userEmail: user.email,
@@ -126,7 +144,7 @@ export default function EventDetailsPage({
         // JOIN EVENT
         const res = await fetch("/api/events/join", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({
             eventId: event._id,
             userEmail: user.email,

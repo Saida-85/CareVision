@@ -89,10 +89,10 @@ export default function Navbar() {
             height={150}
             priority
             style={{
-              height: "40px",
+              height: "50px", // Increased back to 50px
               width: "auto",
               objectFit: "contain",
-              transform: "scale(2.0)",
+              transform: "scale(2.5)", // Restored to scale 2.5
               transformOrigin: "left center",
             }}
           />
