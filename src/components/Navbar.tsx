@@ -228,13 +228,15 @@ export default function Navbar() {
             </div>
           ) : (
             /* Login Link styled as a Button (Fixed nesting issue) */
-            <Link
-              href="/signup"
-              className="flex items-center space-x-2 px-5 py-2 rounded-xl font-semibold text-sm shadow-md transition-all duration-300 bg-[#73573F] text-[#E8E4E2] hover:bg-[#1F1915] dark:bg-[#E8E4E2] dark:text-[#1F1915] dark:hover:bg-[#73573F] dark:hover:text-[#E8E4E2]"
-            >
-              <LogIn className="w-4 h-4" />
-              <span>Login</span>
-            </Link>
+            <div className="relative z-[999] pointer-events-auto">
+              <Link
+                href="/signup"
+                className="flex items-center space-x-2 px-5 py-2 rounded-xl font-semibold text-sm shadow-md transition-all duration-300 bg-[#73573F] text-[#E8E4E2] hover:bg-[#1F1915] dark:bg-[#E8E4E2] dark:text-[#1F1915] dark:hover:bg-[#73573F] dark:hover:text-[#E8E4E2] cursor-pointer"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Login</span>
+              </Link>
+            </div>
           ))}
       </div>
     </nav>
