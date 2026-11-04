@@ -24,7 +24,8 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-    const res = await fetch(`${API_URL}/events/${id}`, {
+    // Fixed: Added "/api/" prefix to match your Express backend routes
+    const res = await fetch(`${API_URL}/api/events/${id}`, {
       cache: "no-store",
     });
     if (!res.ok) return notFound();
