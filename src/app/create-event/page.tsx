@@ -220,21 +220,29 @@ export default function CreateEventPage() {
 
     setSubmitting(true);
     try {
-      // Fetch JWT token using the helper function
-      const token = await getTokenFromClient();
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-      if (!token) {
-        throw new Error(
-          "Authentication error: Could not retrieve secure session token.",
-        );
+      // Attempt to retrieve token safely, fall back if null/undefined in production
+      let token = "";
+      try {
+        token = await getTokenFromClient();
+      } catch (err) {
+        console.warn("Client token helper skipped, using cookie session auth");
       }
 
-      const res = await fetch("/api/events/manage", {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`${API_URL}/api/events/manage`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers,
+        credentials: "include", // Ensures session cookies are sent across domains on Vercel
         body: JSON.stringify({
           title: form.title.trim(),
           eventType: form.eventType,
