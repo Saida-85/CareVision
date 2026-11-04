@@ -6,14 +6,17 @@ import Newsletter from "@/components/Newsletter";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-export const dynamic = "force-dynamic"; // <--- Add this line
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-  let events = [];
+  let events: any[] = [];
   try {
-    const res = await fetch(`${API_URL}/events`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/events`, { cache: "no-store" });
+    if (!res.ok) {
+      throw new Error(`Events API responded with ${res.status}`);
+    }
     const data = await res.json();
     if (Array.isArray(data)) {
       events = data;
@@ -51,11 +54,17 @@ export default async function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {events.slice(0, 6).map((event: any) => (
-            <EventCard key={event._id} event={event} />
-          ))}
-        </div>
+        {events.length === 0 ? (
+          <p className="rounded-3xl border border-dashed border-[#73573F]/40 p-10 text-center text-sm font-light text-[#3E3229]/70 dark:text-[#E8E4E2]/70">
+            No upcoming events to show right now. Please check back soon.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {events.slice(0, 6).map((event: any) => (
+              <EventCard key={event._id} event={event} />
+            ))}
+          </div>
+        )}
       </section>
       {/* Visual Stories Gallery Section */}
       <VisualStories />

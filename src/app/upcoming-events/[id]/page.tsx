@@ -9,7 +9,7 @@ import {
   Tag,
   Clock,
 } from "lucide-react";
-import EventDetails from "@/components/EventDetails"; // <-- Import your interactive component
+import EventDetails from "@/components/EventDetails";
 
 interface EventDetailProps {
   params: Promise<{
@@ -24,7 +24,6 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-    // Fixed: Added "/api/" prefix to match your Express backend routes
     const res = await fetch(`${API_URL}/api/events/${id}`, {
       cache: "no-store",
     });
@@ -39,8 +38,6 @@ export default async function EventDetailsPage({ params }: EventDetailProps) {
     return notFound();
   }
 
-  // Temporary test user ID for development/testing.
-  // Replace this with your actual auth session user ID later!
   const currentUserId = "user_test_123";
 
   return (
